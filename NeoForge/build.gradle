@@ -5,6 +5,10 @@ plugins {
     id 'com.modrinth.minotaur'
 }
 
+repositories {
+    maven { url = "https://api.modrinth.com/maven" }
+}
+
 // Automatically enable neoforge AccessTransformers if the file exists
 // This location is hardcoded in FML and can not be changed.
 // https://github.com/neoforged/FancyModLoader/blob/a952595eaaddd571fbc53f43847680b00894e0c1/loader/src/main/java/net/neoforged/fml/loading/moddiscovery/ModFile.java#L118
@@ -57,9 +61,9 @@ configurations {
 dependencies {
     implementation "net.neoforged:neoforge:${neoforge_version}"
 
-    // Waystones
-    implementation "curse.maven:waystones-245755:${waystones_fileid_neoforge}"
-    implementation "curse.maven:balm-531761:${balm_fileid_neoforge}"
+    // Waystones + Balm
+    implementation "maven.modrinth:waystones:21.11.9+neoforge-1.21.11"
+    implementation "maven.modrinth:balm:21.11.9+neoforge-1.21.11"
 }
 
 String[] compatibleVersions = project.compatible_versions.split(',')

@@ -7,13 +7,14 @@ import com.yungnickyoung.minecraft.travelerstitles.services.Services;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.PermissionProviderCheck;
 import net.minecraft.network.chat.Component;
 
 public class ReloadConfigCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
         dispatcher.register(Commands
             .literal("tt_reload")
-            .requires((source) -> source.hasPermission(2))
+            .requires(source -> new PermissionProviderCheck(Commands.LEVEL_GAMEMASTERS).test(source))
             .executes(ctx -> reloadConfig(ctx.getSource())));
     }
 

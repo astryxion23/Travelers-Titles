@@ -39,7 +39,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
 
     @Override
     public void init() {
-        NeoForge.EVENT_BUS.addListener(this::onWaystoneListReceived);
+        WaystonesListReceivedEvent.EVENT.register(this::onWaystoneListReceived);
         NeoForge.EVENT_BUS.addListener(this::updateClosestWaystone);
     }
 
@@ -47,10 +47,11 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
      * Updates the stored player's list of known waystones.
      */
     private void onWaystoneListReceived(final WaystonesListReceivedEvent event) {
-        if (event.getWaystoneType().equals(WaystoneTypes.WAYSTONE)) {
-            knownWaystones = event.getWaystones();
-        } else if (WaystoneTypes.isSharestone(event.getWaystoneType())) {
-            sharestones.addAll(event.getWaystones());
+        List<Waystone> list = event.waystones();
+        if (event.waystoneType().equals(WaystoneTypes.WAYSTONE)) {
+            knownWaystones = new ArrayList<>(list);
+        } else if (WaystoneTypes.isSharestone(event.waystoneType())) {
+            sharestones.addAll(list);
         }
     }
 
@@ -59,13 +60,13 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
         waystoneUpdateTimer++;
 
         if (waystoneUpdateTimer % 10 == 0) {
-            String playerDimension = player.level().dimension().location().toString();
+            String playerDimension = player.level().dimension().identifier().toString();
             BlockPos playerPos = player.blockPosition();
             double minSqDist = Double.MAX_VALUE;
 
             // Iterate waystones, finding closest one
             for (Waystone waystone : knownWaystones) {
-                String waystoneDimension = waystone.getDimension().location().toString();
+                String waystoneDimension = waystone.getDimension().identifier().toString();
 
                 // Only consider waystones with names
                 if (!waystone.hasName()) continue;
@@ -82,7 +83,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
 
             // Iterate sharestones, finding closest one
             for (Waystone sharestone : sharestones) {
-                String sharestoneDimension = sharestone.getDimension().location().toString();
+                String sharestoneDimension = sharestone.getDimension().identifier().toString();
 
                 // Only consider sharestones with names
                 if (!sharestone.hasName()) continue;

@@ -5,7 +5,6 @@ import com.yungnickyoung.minecraft.travelerstitles.module.CompatModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.SoundModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.TagModule;
 import com.yungnickyoung.minecraft.travelerstitles.services.Services;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -14,12 +13,15 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.dimension.DimensionType;
+
+import java.util.Objects;
 
 public class TitleRenderManager {
     public final TitleRenderer<Biome> biomeTitleRenderer = new TitleRenderer<>(
@@ -126,7 +128,7 @@ public class TitleRenderManager {
 
         if (dimensionTitleRenderer.enabled && !dimensionTitleRenderer.matchesAnyRecentEntry(d -> d == currDimension)) {
             // Get dimension key
-            ResourceLocation dimensionBaseKey = world.dimension().location();
+            Identifier dimensionBaseKey = world.dimension().identifier();
             String dimensionNameKey = Util.makeDescriptionId(TravelersTitlesCommon.MOD_ID, dimensionBaseKey);
 
             // Ignore blacklisted dimensions
@@ -164,12 +166,13 @@ public class TitleRenderManager {
             return;
         }
 
-        ResourceLocation biomeBaseKey = world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biomeHolder.value());
+        final var biomeLookup = world.registryAccess().lookupOrThrow(Registries.BIOME);
+        Identifier biomeBaseKey = biomeLookup.getKey(biomeHolder.value());
 
         if (
             biomeTitleRenderer.enabled &&
             biomeTitleRenderer.cooldownTimer <= 0 &&
-            !biomeTitleRenderer.matchesAnyRecentEntry(b -> world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(b) == biomeBaseKey)
+            !biomeTitleRenderer.matchesAnyRecentEntry(b -> Objects.equals(biomeLookup.getKey(b), biomeBaseKey))
         ) {
             String overrideBiomeNameKey = Util.makeDescriptionId(TravelersTitlesCommon.MOD_ID + ".biome", biomeBaseKey);
             String normalBiomeNameKey = Util.makeDescriptionId("biome", biomeBaseKey);
