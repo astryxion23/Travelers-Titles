@@ -1,0 +1,37 @@
+package com.yungnickyoung.minecraft.travelerstitles.services;
+
+import com.yungnickyoung.minecraft.travelerstitles.module.ConfigModule;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.entity.player.Player;
+
+public class FabricWaystonesCompatHelper implements IWaystonesCompatHelper {
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public boolean updateWaystoneTitle(Player player) {
+        return false;
+    }
+
+    @Override
+    public void clientTick() {
+    }
+
+    @Override
+    public void renderText(float partialTicks, GuiGraphics guiGraphics) {
+    }
+
+    @Override
+    public void reset() {
+    }
+
+    @Override
+    public boolean isRendering() {
+        return false;
+    }
+
+    @Override
+    public void updateRendererFromConfig(ConfigModule.Waystones config) {
+    }
+}

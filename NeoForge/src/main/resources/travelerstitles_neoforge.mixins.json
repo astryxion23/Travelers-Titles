@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.yungnickyoung.minecraft.travelerstitles.neoforge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "travelerstitles.refmap.json",
+  "mixins": [],
+  "client": [
+    "ModelManagerAnimationSharedStateMixin",
+    "AnimationLoaderReloadSharedStateMixin"
+  ],
+  "mixins": [
+    "SharedStateAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
