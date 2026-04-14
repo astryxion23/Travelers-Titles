@@ -1,0 +1,21 @@
+package com.yungnickyoung.minecraft.travelerstitles.services;
+
+import com.yungnickyoung.minecraft.travelerstitles.module.ConfigModule;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.entity.player.Player;
+
+public interface IWaystonesCompatHelper {
+    void init();
+
+    boolean updateWaystoneTitle(Player player);
+
+    void clientTick();
+
+    void renderText(float partialTicks, GuiGraphicsExtractor guiGraphics);
+
+    void reset();
+
+    boolean isRendering();
+
+    void updateRendererFromConfig(ConfigModule.Waystones config);
+}

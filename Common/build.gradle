@@ -1,18 +1,27 @@
 plugins {
     id 'multiloader-common'
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
-}
-
-minecraft {
-    version(mc_version)
-    def aw = file("src/main/resources/${mod_id}.accesswidener")
-    if (aw.exists()) {
-        accessWideners(aw)
-    }
+    id 'net.fabricmc.fabric-loom'
 }
 
 dependencies {
-    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
+    minecraft "com.mojang:minecraft:${mc_version}"
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+
+    mixin {
+        defaultRefmapName.set("${mod_id}.refmap.json")
+    }
 }
 
 configurations {
@@ -40,6 +49,7 @@ sourceSets {
 
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonJava sourceSets.client.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
     commonGeneratedResources sourceSets.generated.resources.sourceDirectories.singleFile
 }

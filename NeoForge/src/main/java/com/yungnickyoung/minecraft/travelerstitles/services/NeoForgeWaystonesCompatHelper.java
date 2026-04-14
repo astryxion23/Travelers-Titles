@@ -1,5 +1,6 @@
 package com.yungnickyoung.minecraft.travelerstitles.services;
 
+import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesClient;
 import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
 import com.yungnickyoung.minecraft.travelerstitles.module.ConfigModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.SoundModule;
@@ -7,7 +8,7 @@ import com.yungnickyoung.minecraft.travelerstitles.render.TitleRenderer;
 import net.blay09.mods.waystones.api.Waystone;
 import net.blay09.mods.waystones.api.WaystoneTypes;
 import net.blay09.mods.waystones.api.event.WaystonesListReceivedEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
@@ -39,7 +40,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
 
     @Override
     public void init() {
-        NeoForge.EVENT_BUS.addListener(this::onWaystoneListReceived);
+        WaystonesListReceivedEvent.EVENT.register(this::onWaystoneListReceived);
         NeoForge.EVENT_BUS.addListener(this::updateClosestWaystone);
     }
 
@@ -47,25 +48,29 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
      * Updates the stored player's list of known waystones.
      */
     private void onWaystoneListReceived(final WaystonesListReceivedEvent event) {
-        if (event.getWaystoneType().equals(WaystoneTypes.WAYSTONE)) {
-            knownWaystones = event.getWaystones();
-        } else if (WaystoneTypes.isSharestone(event.getWaystoneType())) {
-            sharestones.addAll(event.getWaystones());
+        List<Waystone> list = event.waystones();
+        if (event.waystoneType().equals(WaystoneTypes.WAYSTONE)) {
+            knownWaystones = new ArrayList<>(list);
+        } else if (WaystoneTypes.isSharestone(event.waystoneType())) {
+            sharestones.addAll(list);
         }
     }
 
     private void updateClosestWaystone(final PlayerTickEvent.Post event) {
         Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            return;
+        }
         waystoneUpdateTimer++;
 
         if (waystoneUpdateTimer % 10 == 0) {
-            String playerDimension = player.level().dimension().location().toString();
+            String playerDimension = player.level().dimension().identifier().toString();
             BlockPos playerPos = player.blockPosition();
             double minSqDist = Double.MAX_VALUE;
 
             // Iterate waystones, finding closest one
             for (Waystone waystone : knownWaystones) {
-                String waystoneDimension = waystone.getDimension().location().toString();
+                String waystoneDimension = waystone.getDimension().identifier().toString();
 
                 // Only consider waystones with names
                 if (!waystone.hasName()) continue;
@@ -82,7 +87,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
 
             // Iterate sharestones, finding closest one
             for (Waystone sharestone : sharestones) {
-                String sharestoneDimension = sharestone.getDimension().location().toString();
+                String sharestoneDimension = sharestone.getDimension().identifier().toString();
 
                 // Only consider sharestones with names
                 if (!sharestone.hasName()) continue;
@@ -131,7 +136,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
 
             // Play waystone entry sound if we haven't just changed dimensions.
             // This ensures the waystone sound won't overlap with the dimension sound.
-            if (TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleTimer <= 0) {
+            if (TravelersTitlesClient.TITLE_MANAGER.dimensionTitleRenderer.titleTimer <= 0) {
                 player.playSound(SoundModule.WAYSTONE, (float) TravelersTitlesCommon.CONFIG.sound.waystoneVolume, (float) TravelersTitlesCommon.CONFIG.sound.waystonePitch);
             }
         }
@@ -144,7 +149,7 @@ public class NeoForgeWaystonesCompatHelper implements IWaystonesCompatHelper {
     }
 
     @Override
-    public void renderText(float partialTicks, GuiGraphics guiGraphics) {
+    public void renderText(float partialTicks, GuiGraphicsExtractor guiGraphics) {
         waystoneTitleRenderer.renderText(partialTicks, guiGraphics);
     }
 
