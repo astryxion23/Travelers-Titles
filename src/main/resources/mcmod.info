@@ -1,0 +1,14 @@
+[
+  {
+    "modid": "${modId}",
+    "name": "${modName}",
+    "description": "${modDescription}",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://www.curseforge.com/minecraft/mc-mods/travelers-titles",
+    "authorList": ["${modAuthor}"],
+    "credits": "${modCredits}",
+    "logoFile": "",
+    "dependencies": ["waystones"]
+  }
+]

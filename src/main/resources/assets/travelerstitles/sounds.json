@@ -1,0 +1,14 @@
+{
+  "biome": {
+    "category": "master",
+    "sounds": ["travelerstitles:biome"]
+  },
+  "dimension": {
+    "category": "master",
+    "sounds": ["travelerstitles:dimension"]
+  },
+  "waystone": {
+    "category": "master",
+    "sounds": ["travelerstitles:waystone"]
+  }
+}

@@ -1,28 +1,220 @@
-plugins {
-    id 'fabric-loom' version '1.11.7' apply false
-    id "org.jetbrains.gradle.plugin.idea-ext" version "1.1.7" // required for NeoGradle
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT' apply false
-    id 'net.darkhax.curseforgegradle' version "${curseforgegradle_version}" apply false // curseforge publishing
-    id "com.modrinth.minotaur" version "2.+" apply false // modrinth publishing
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+    }
+}
+        
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+// FMLFolderResourcePack / FMLFileResourcePack use ModContainer.getSource() as the pack root and discover domains
+// from <root>/assets/. Default Gradle splits classes (build/classes/java/main) and resources (build/resources/main),
+// so the dev pack root had no assets/ tree → empty domains → SoundHandler never loads sounds.json → "Missing sound".
+sourceSets.main.output.resourcesDir = file("$buildDir/classes/java/main")
+
+version = "1.12.2-${modVersion}"
+group = modGroup
+archivesBaseName = modFileName
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xmaxerrs', '10000']
 }
 
-subprojects {
-    configurations.all {
-        resolutionStrategy {
-            cacheChangingModulesFor 60, 'seconds'
-            cacheDynamicVersionsFor 60, 'seconds'
+minecraft {
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: modMcpMappingsChannel, version: modMcpMappingsVersion
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                travelerstitles {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                travelerstitles {
+                    source sourceSets.main
+                }
+            }
         }
     }
-    // Pass the raw project version string as an extra property to each subproject
-    // since the version property will be overwritten by the complete version string
-    ext {
-        rawVersion = project.version
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://www.cursemaven.com" }
+}
+
+dependencies {
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft "net.minecraftforge:forge:${modMinecraftVersion}-${modForgeVersion}"
+
+    // compileOnly + run/mods: if the deobf Waystones jar sits ahead of Forge on the Gradle run classpath, FML can
+    // mis-order core types (see ForgeGradle #748 / Lex “forge jar should be first”). Compile against Waystones,
+    // ship the same jar into run/mods so it still loads as a normal mod at runtime.
+    compileOnly(fg.deobf("curse.maven:waystones-245755:2612128")) {
+        transitive = false
+    }
+
+    // You may put jars on which you depend on in ./libs or you may define them like so..
+    // compile "some.group:artifact:version:classifier"
+    // compile "some.group:artifact:version"
+
+    // Real examples
+    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // These dependencies get remapped to your current MCP mappings
+    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", modMinecraftVersion
+    inputs.property "modId", modId
+    inputs.property "modName", modName
+    inputs.property "modAuthor", modAuthor
+    inputs.property "modDescription", modDescription
+    inputs.property "modCredits", modCredits
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version,
+                'mcversion': modMinecraftVersion,
+                'modId': modId,
+                'modName': modName,
+                'modAuthor': modAuthor,
+                'modDescription': modDescription,
+                'modCredits': modCredits
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
     }
 }
 
-task publishCurseForge(dependsOn: [':Fabric:publishCurseForgeFabric', ':NeoForge:publishCurseForgeNeoForge']) {
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    // Dev-only shim: must not ship in the published mod (would replace Forge's Side for the whole game).
+    exclude 'net/minecraftforge/fml/relauncher/Side.class'
+    manifest {
+        attributes([
+            "Specification-Title": modId,
+            "Specification-Vendor": modGroup,
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor": modGroup,
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
-task publishModrinth(dependsOn: [':Fabric:modrinth', ':NeoForge:modrinth']) {
+
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+
+task syncWaystonesToRunMods(type: Copy) {
+    group = 'forgegradle runs'
+    description = 'Copies the deobf Waystones jar into run/mods (keeps it off the Java classpath so Forge loads first).'
+    from configurations.compileOnly.files.findAll { f -> f.name.contains('waystones') && f.name.endsWith('.jar') }
+    into file('run/mods')
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
 }
-task publishCurseAndModrinth(dependsOn: ['publishCurseForge', 'publishModrinth']) {
+
+afterEvaluate {
+    if (tasks.findByName('runClient')) {
+        tasks.runClient.dependsOn syncWaystonesToRunMods
+    }
+    if (tasks.findByName('runServer')) {
+        tasks.runServer.dependsOn syncWaystonesToRunMods
+    }
+}
+
+// LegacyDev/FG3 put jars on the game classpath that FML 1.12's JarDiscoverer cannot parse with bundled ASM 5.x,
+// and mergetool duplicates select FML types. Strip only those entries; do not reorder the classpath (project
+// output must stay ahead of the userdev jar so the two-constant Side shim loads — see Side.java in this package).
+gradle.projectsEvaluated {
+    def isForgeGradleDevClasspathJunk = { File f ->
+        String n = f.name
+        if (!n.endsWith('.jar')) return false
+        if (n == 'asm-6.2.jar') return true
+        if (n.contains('asm-tree-6.2')) return true
+        if (n.contains('asm-util-6.2')) return true
+        if (n.contains('asm-analysis-6.2')) return true
+        if (n.contains('slf4j-api') && n.contains('1.8.0-beta4')) return true
+        if (n.contains('log4j-slf4j18-impl')) return true
+        if (n.contains('mergetool') && n.contains('forge')) return true
+        false
+    }
+    tasks.withType(JavaExec).configureEach { JavaExec exec ->
+        if (exec.name != 'runClient' && exec.name != 'runServer') return
+        exec.doFirst {
+            Set<File> kept = new LinkedHashSet<>(exec.classpath.files)
+            kept.removeAll { File f -> isForgeGradleDevClasspathJunk(f) }
+            exec.setClasspath(project.files(kept))
+        }
+    }
+}
+
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
 }
