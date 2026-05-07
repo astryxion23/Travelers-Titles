@@ -68,7 +68,8 @@ public class ConfigDimensions {
 
         dimensionBlacklist = new TTConfig.StrValue(cfg.get(c, "Blacklisted Dimensions", "[]",
             " Dimensions that should not have any title displayed when the player enters them.\n" +
-                " Example: \"[minecraft:overworld, minecraft:the_nether]\"\n" +
+                " Use stable dimension ids from /dimensiontitle or the lang keys after 'travelerstitles.dimension.'.\n" +
+                " Example: \"[overworld, the_nether]\"\n" +
                 " Default: \"[]\""));
 
         centerText = new TTConfig.BoolValue(cfg.get(c, "Center Title", true,
