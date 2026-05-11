@@ -24,6 +24,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TitleRenderManager {
     public final TitleRenderer<Biome> biomeTitleRenderer = new TitleRenderer<>(
@@ -61,15 +62,42 @@ public class TitleRenderManager {
         return type + "." + id.getResourceDomain() + "." + id.getResourcePath();
     }
 
+    public static String normalizeTranslationKeyPart(final String rawValue) {
+        if (rawValue == null || rawValue.isEmpty()) {
+            return "unknown";
+        }
+
+        String normalized = rawValue.toLowerCase(Locale.ROOT)
+            .replaceAll("[^a-z0-9]+", "_")
+            .replaceAll("_+", "_")
+            .replaceAll("^_|_$", "");
+
+        return normalized.isEmpty() ? "unknown" : normalized;
+    }
+
+    public static String getStableDimensionId(final World world) {
+        final DimensionType dimensionType = world.provider.getDimensionType();
+        return normalizeTranslationKeyPart(dimensionType.getName());
+    }
+
+    public static String getStableDimensionTranslationKey(final World world) {
+        return TravelersTitles.MOD_ID + ".dimension." + getStableDimensionId(world);
+    }
+
+    public static boolean isDimensionBlacklisted(final World world) {
+        return TravelersTitles.titleManager.blacklistedDimensions.contains(getStableDimensionId(world));
+    }
+
     /**
      * Resolves the displayed dimension title: mod lang entry if present, otherwise a readable label from the registry path (no placeholder stubs).
      */
-    public static ITextComponent createDimensionTitleComponent(final ResourceLocation dimensionBaseKey) {
-        final String dimensionNameKey = makeTranslationKey(TravelersTitles.MOD_ID, dimensionBaseKey);
-        if (I18n.hasKey(dimensionNameKey)) {
-            return new TextComponentTranslation(dimensionNameKey);
+    public static ITextComponent createDimensionTitleComponent(final World world) {
+        final String stableDimensionNameKey = getStableDimensionTranslationKey(world);
+        if (I18n.hasKey(stableDimensionNameKey)) {
+            return new TextComponentTranslation(stableDimensionNameKey);
         }
-        return new TextComponentString(formatRegistryPathForDisplay(dimensionBaseKey.getResourcePath()));
+
+        return new TextComponentString(formatRegistryPathForDisplay(world.provider.getDimensionType().getName()));
     }
 
     /**
@@ -131,14 +159,6 @@ public class TitleRenderManager {
             }
         }
         return sb.length() > 0 ? sb.toString() : path;
-    }
-
-    /**
-     * Resource key used for dimension title translations, aligned with 1.16 {@code DimensionType} / registry naming where possible.
-     */
-    public static ResourceLocation getDimensionResourceLocation(World world) {
-        DimensionType dimensionType = world.provider.getDimensionType();
-        return new ResourceLocation("minecraft", dimensionType.getName());
     }
 
     /**
@@ -217,13 +237,12 @@ public class TitleRenderManager {
         DimensionType currDimension = world.provider.getDimensionType();
 
         if (dimensionTitleRenderer.enabled && !dimensionTitleRenderer.containsEntry(d -> d == currDimension)) {
-            ResourceLocation dimensionBaseKey = getDimensionResourceLocation(world);
-            String dimensionNameKey = makeTranslationKey(TravelersTitles.MOD_ID, dimensionBaseKey);
+            String stableDimensionNameKey = getStableDimensionTranslationKey(world);
 
-            if (!blacklistedDimensions.contains(dimensionBaseKey.toString())) {
-                ITextComponent dimensionTitle = createDimensionTitleComponent(dimensionBaseKey);
+            if (!isDimensionBlacklisted(world)) {
+                ITextComponent dimensionTitle = createDimensionTitleComponent(world);
 
-                String dimensionColorKey = dimensionNameKey + ".color";
+                String dimensionColorKey = stableDimensionNameKey + ".color";
                 String dimensionColorStr = I18n.hasKey(dimensionColorKey)
                     ? I18n.format(dimensionColorKey)
                     : dimensionTitleRenderer.titleDefaultTextColor;

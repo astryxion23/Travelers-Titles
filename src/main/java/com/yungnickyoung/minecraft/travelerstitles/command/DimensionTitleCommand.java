@@ -8,7 +8,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -23,7 +22,7 @@ public class DimensionTitleCommand extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/dimensiontitle <namespace:path>";
+        return "/dimensiontitle <stable-id|dimension-name|dimension-id>";
     }
 
     @Override
@@ -39,36 +38,47 @@ public class DimensionTitleCommand extends CommandBase {
         if (args.length < 1) {
             throw new WrongUsageException(getUsage(sender));
         }
-        ResourceLocation dimensionId = new ResourceLocation(args[0]);
+
+        String dimensionQuery = buildDimensionQuery(args);
 
         WorldServer targetWorld = null;
+
+        Integer numericDimensionId = tryParseDimensionId(dimensionQuery);
+        if (numericDimensionId != null) {
+            targetWorld = DimensionManager.getWorld(numericDimensionId);
+        }
+
         for (Integer dim : DimensionManager.getStaticDimensionIDs()) {
+            if (targetWorld != null) {
+                break;
+            }
+
             WorldServer ws = DimensionManager.getWorld(dim);
-            if (ws != null && TitleRenderManager.getDimensionResourceLocation(ws).equals(dimensionId)) {
+            if (ws != null && matchesDimensionQuery(ws, dimensionQuery)) {
                 targetWorld = ws;
                 break;
             }
         }
 
         if (targetWorld == null) {
-            throw new CommandException("commands.locatebiome.invalid", dimensionId);
+            throw new CommandException("commands.locatebiome.invalid", dimensionQuery);
         }
 
-        final ResourceLocation dimensionBaseKey = TitleRenderManager.getDimensionResourceLocation(targetWorld);
+        final WorldServer selectedWorld = targetWorld;
         Minecraft.getMinecraft().addScheduledTask(() -> {
             if (TravelersTitles.titleManager == null) {
                 return;
             }
 
-            String dimensionNameKey = TitleRenderManager.makeTranslationKey(TravelersTitles.MOD_ID, dimensionBaseKey);
+            String stableDimensionNameKey = TitleRenderManager.getStableDimensionTranslationKey(selectedWorld);
 
-            if (TravelersTitles.titleManager.blacklistedDimensions.contains(dimensionBaseKey.toString())) {
+            if (TitleRenderManager.isDimensionBlacklisted(selectedWorld)) {
                 Minecraft.getMinecraft().player.sendMessage(new TextComponentString("That dimension is blacklisted, so its title won't normally show!"));
             }
 
-            ITextComponent dimensionTitle = TitleRenderManager.createDimensionTitleComponent(dimensionBaseKey);
+            ITextComponent dimensionTitle = TitleRenderManager.createDimensionTitleComponent(selectedWorld);
 
-            String dimensionColorKey = dimensionNameKey + ".color";
+            String dimensionColorKey = stableDimensionNameKey + ".color";
             String dimensionColorStr = I18n.hasKey(dimensionColorKey)
                 ? I18n.format(dimensionColorKey)
                 : TravelersTitles.titleManager.dimensionTitleRenderer.titleDefaultTextColor;
@@ -76,5 +86,34 @@ public class DimensionTitleCommand extends CommandBase {
             TravelersTitles.titleManager.dimensionTitleRenderer.setColor(dimensionColorStr);
             TravelersTitles.titleManager.dimensionTitleRenderer.displayTitle(dimensionTitle, null);
         });
+    }
+
+    private static String buildDimensionQuery(final String[] args) {
+        final StringBuilder builder = new StringBuilder();
+        for (String arg : args) {
+            if (builder.length() > 0) {
+                builder.append(' ');
+            }
+            builder.append(arg);
+        }
+        return builder.toString().trim();
+    }
+
+    private static Integer tryParseDimensionId(final String dimensionQuery) {
+        try {
+            return Integer.parseInt(dimensionQuery);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private static boolean matchesDimensionQuery(final WorldServer world, final String dimensionQuery) {
+        final String normalizedQuery = TitleRenderManager.normalizeTranslationKeyPart(dimensionQuery);
+        final String rawDimensionName = world.provider.getDimensionType().getName();
+
+        return TitleRenderManager.getStableDimensionId(world).equals(normalizedQuery)
+            || TitleRenderManager.getStableDimensionTranslationKey(world).equalsIgnoreCase(dimensionQuery)
+            || rawDimensionName.equalsIgnoreCase(dimensionQuery)
+            || TitleRenderManager.normalizeTranslationKeyPart(rawDimensionName).equals(normalizedQuery);
     }
 }

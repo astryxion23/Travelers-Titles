@@ -10,6 +10,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TTModConfig {
     public static void init() {
@@ -95,6 +96,9 @@ public class TTModConfig {
 
         // Parse string to list
         inputListOfStrings = Lists.newArrayList(rawStringofList.substring(1, strLen - 1).split(",\\s*"));
-        TravelersTitles.titleManager.blacklistedDimensions = Lists.newArrayList(inputListOfStrings);
+        TravelersTitles.titleManager.blacklistedDimensions = inputListOfStrings.stream()
+            .map(String::trim)
+            .filter(entry -> !entry.isEmpty())
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 }
