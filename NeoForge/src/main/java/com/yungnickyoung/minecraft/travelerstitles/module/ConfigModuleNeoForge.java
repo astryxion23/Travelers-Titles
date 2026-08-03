@@ -21,8 +21,14 @@ public class ConfigModuleNeoForge {
     }
 
     public static void onWorldLoad(LevelEvent.Load event) {
+        // LevelEvent.Load runs for every dimension on both logical sides. Client config and title
+        // renderers must only be touched from the client level; doing this from the integrated
+        // server thread while loading dimensions can deadlock the client during world creation.
+        if (!event.getLevel().isClientSide()) {
+            return;
+        }
         bakeConfig();
-        ConfigModule.updateRenderersFromConfig();
+        ClientConfigModule.updateRenderersFromConfig();
     }
 
     public static void configChanged(ModConfigEvent event) {
@@ -31,7 +37,7 @@ public class ConfigModuleNeoForge {
         // Bake config
         if (config.getSpec() == TTConfigNeoForge.SPEC) {
             bakeConfig();
-            ConfigModule.updateRenderersFromConfig();
+            ClientConfigModule.updateRenderersFromConfig();
         }
     }
 

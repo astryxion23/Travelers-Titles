@@ -1,11 +1,13 @@
 package com.yungnickyoung.minecraft.travelerstitles.services;
 
+import com.yungnickyoung.minecraft.travelerstitles.module.CompatModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.ConfigModuleFabric;
 
 public class FabricModulesLoader implements IModulesLoader {
     @Override
     public void loadModules() {
-        IModulesLoader.super.loadModules(); // Load common modules
+        IModulesLoader.super.loadModules();
+        CompatModule.init();
         ConfigModuleFabric.init();
     }
 }

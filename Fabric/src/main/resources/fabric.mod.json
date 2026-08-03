@@ -8,9 +8,9 @@
     "Astryxion"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/travelers-titles-fabric",
-    "sources": "https://github.com/yungnickyoung/Travelers-Titles",
-    "issues": "https://github.com/yungnickyoung/Travelers-Titles/issues",
+    "homepage": "https://github.com/astryxion/Travelers-Titles",
+    "sources": "https://github.com/astryxion/Travelers-Titles",
+    "issues": "https://github.com/astryxion/Travelers-Titles/issues",
     "discord": "discord.gg/rns3beq"
   },
   "license": "${license}",
@@ -30,7 +30,7 @@
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "fabric": ">=${fabric_version}",
+    "fabric-api": ">=${fabric_api_version}",
     "minecraft": "${mc_version_range_fabric}",
     "cloth-config2": ">=${clothconfig_version_fabric}",
     "java": ">=${java_version}"

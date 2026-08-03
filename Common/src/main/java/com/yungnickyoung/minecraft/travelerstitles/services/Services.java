@@ -8,8 +8,6 @@ public class Services {
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
     public static final IModulesLoader MODULES = load(IModulesLoader.class);
     public static final IConfigReloader CONFIG_RELOADER = load(IConfigReloader.class);
-    public static final IWaystonesCompatHelper WAYSTONES = load(IWaystonesCompatHelper.class);
-
     public static <T> T load(Class<T> clazz) {
         final T loadedService = ServiceLoader.load(clazz)
                 .findFirst()

@@ -1,6 +1,6 @@
 package com.yungnickyoung.minecraft.travelerstitles.mixin;
 
-import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
+import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesClient;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.portal.TeleportTransition;
@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class EntityChangeDimensionMixin {
     @Inject(method = "teleportCrossDimension", at = @At(value = "TAIL"))
     private void onPlayerChangeDimension(ServerLevel sourceWorld, ServerLevel targetWorld, TeleportTransition $$2, CallbackInfoReturnable<Entity> cir) {
-        TravelersTitlesCommon.titleManager.playerChangedDimension(this);
+        TravelersTitlesClient.TITLE_MANAGER.playerChangedDimension(this);
     }
 }

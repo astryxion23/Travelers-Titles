@@ -3,12 +3,12 @@ package com.yungnickyoung.minecraft.travelerstitles.render;
 import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.function.Predicate;
 
@@ -60,7 +60,7 @@ public class TitleRenderer<T> {
         this.isTextCentered = centerText;
     }
 
-    public void renderText(float partialTicks, GuiGraphics guiGraphics) {
+    public void renderText(float partialTicks, GuiGraphicsExtractor guiGraphics) {
         if (displayedTitle != null && titleTimer > 0) {
             float age = (float) titleTimer - partialTicks;
             int opacity = 255;
@@ -93,13 +93,13 @@ public class TitleRenderer<T> {
                         ? this.titleXOffset + (-titleWidth / 2)
                         : this.titleXOffset;
 
-                    guiGraphics.drawString(fontRenderer, displayedTitle, xOffset, titleYOffset, titleTextcolor | alpha, showTextShadow);
+                    guiGraphics.text(fontRenderer, displayedTitle, xOffset, titleYOffset, titleTextcolor | alpha, showTextShadow);
 
                     if (displayedSubTitle != null) {
                         guiGraphics.pose().scale(1.3F / titleTextSize, 1.3F / titleTextSize);
                         int subtitleWidth = fontRenderer.width(displayedSubTitle);
                         drawBackdrop(guiGraphics, 5, subtitleWidth, 0xFFFFFF | alpha);
-                        guiGraphics.drawString(fontRenderer, displayedSubTitle, -subtitleWidth / 2, -35, 0xFFFFFF | alpha, showTextShadow);
+                        guiGraphics.text(fontRenderer, displayedSubTitle, -subtitleWidth / 2, -35, 0xFFFFFF | alpha, showTextShadow);
                     }
                 } finally {
                     guiGraphics.pose().popMatrix();
@@ -154,7 +154,7 @@ public class TitleRenderer<T> {
         return this.recentEntries.stream().anyMatch(entryMatchPredicate);
     }
 
-    protected void drawBackdrop(GuiGraphics guiGraphics, int yOffset, int width, int color) {
+    protected void drawBackdrop(GuiGraphicsExtractor guiGraphics, int yOffset, int width, int color) {
         int textBackgroundColor = Minecraft.getInstance().options.getBackgroundColor(0.0F);
         if (textBackgroundColor != 0) {
             int xOffset = -width / 2;

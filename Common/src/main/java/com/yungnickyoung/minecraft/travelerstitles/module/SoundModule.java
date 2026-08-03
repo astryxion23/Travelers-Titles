@@ -3,7 +3,7 @@ package com.yungnickyoung.minecraft.travelerstitles.module;
 import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 
 public class SoundModule {
@@ -12,7 +12,7 @@ public class SoundModule {
     public static final SoundEvent WAYSTONE = registerSound("waystone");
 
     private static SoundEvent registerSound(String name) {
-        ResourceLocation id = TravelersTitlesCommon.id(name);
+        Identifier id = TravelersTitlesCommon.id(name);
         return SoundEvent.createVariableRangeEvent(id);
     }
 

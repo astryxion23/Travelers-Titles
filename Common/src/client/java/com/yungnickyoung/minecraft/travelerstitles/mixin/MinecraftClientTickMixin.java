@@ -1,6 +1,6 @@
 package com.yungnickyoung.minecraft.travelerstitles.mixin;
 
-import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
+import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesClient;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftClientTickMixin {
     @Inject(method = "tick", at = @At(value = "HEAD"))
     private void onClientTick(CallbackInfo ci) {
-        TravelersTitlesCommon.titleManager.clientTick();
+        TravelersTitlesClient.TITLE_MANAGER.clientTick();
     }
 }

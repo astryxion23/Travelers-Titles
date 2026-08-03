@@ -1,7 +1,7 @@
 package com.yungnickyoung.minecraft.travelerstitles.mixin;
 
 import com.mojang.authlib.GameProfile;
-import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
+import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesClient;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +19,6 @@ public abstract class LocalPlayerTickMixin extends Player {
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     private void onPostPlayerTick(CallbackInfo ci) {
-        TravelersTitlesCommon.titleManager.playerTick(this);
+        TravelersTitlesClient.TITLE_MANAGER.playerTick(this);
     }
 }

@@ -1,8 +1,6 @@
 package com.yungnickyoung.minecraft.travelerstitles.module;
 
 import com.google.common.collect.Lists;
-import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
-import com.yungnickyoung.minecraft.travelerstitles.services.Services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,38 +70,5 @@ public class ConfigModule {
         public int range = 30;
         public boolean waystonesOverrideBiomeTitle = true;
         public boolean onlyUpdateAtSurface = false;
-    }
-
-    /**
-     * Bakes in updated config values.
-     */
-    public static void updateRenderersFromConfig() {
-        // Biome
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.maxRecentListSize = TravelersTitlesCommon.CONFIG.biomes.recentBiomeCacheSize;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.enabled = TravelersTitlesCommon.CONFIG.biomes.enabled;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleFadeInTicks = TravelersTitlesCommon.CONFIG.biomes.textFadeInTime;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleDisplayTime = TravelersTitlesCommon.CONFIG.biomes.textDisplayTime;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleFadeOutTicks = TravelersTitlesCommon.CONFIG.biomes.textFadeOutTime;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleDefaultTextColor = TravelersTitlesCommon.CONFIG.biomes.textColor;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.showTextShadow = TravelersTitlesCommon.CONFIG.biomes.renderShadow;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleTextSize = (float) TravelersTitlesCommon.CONFIG.biomes.textSize;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleXOffset = TravelersTitlesCommon.CONFIG.biomes.textXOffset;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.titleYOffset = TravelersTitlesCommon.CONFIG.biomes.textYOffset;
-        TravelersTitlesCommon.titleManager.biomeTitleRenderer.isTextCentered = TravelersTitlesCommon.CONFIG.biomes.centerText;
-
-        // Dimension
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.enabled = TravelersTitlesCommon.CONFIG.dimensions.enabled;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleFadeInTicks = TravelersTitlesCommon.CONFIG.dimensions.textFadeInTime;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleDisplayTime = TravelersTitlesCommon.CONFIG.dimensions.textDisplayTime;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleFadeOutTicks = TravelersTitlesCommon.CONFIG.dimensions.textFadeOutTime;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleDefaultTextColor = TravelersTitlesCommon.CONFIG.dimensions.textColor;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.showTextShadow = TravelersTitlesCommon.CONFIG.dimensions.renderShadow;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleTextSize = (float) TravelersTitlesCommon.CONFIG.dimensions.textSize;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleXOffset = TravelersTitlesCommon.CONFIG.dimensions.textXOffset;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.titleYOffset = TravelersTitlesCommon.CONFIG.dimensions.textYOffset;
-        TravelersTitlesCommon.titleManager.dimensionTitleRenderer.isTextCentered = TravelersTitlesCommon.CONFIG.dimensions.centerText;
-
-        // Waystones
-        Services.WAYSTONES.updateRendererFromConfig(TravelersTitlesCommon.CONFIG.waystones);
     }
 }

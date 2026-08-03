@@ -101,7 +101,7 @@ processResources {
             "mc_version"                   : mc_version,
             "mc_version_range"             : mc_version_range,
             "mc_version_range_fabric"      : mc_version_range_fabric,
-            "fabric_version"               : fabric_version,
+            "fabric_api_version"           : fabric_api_version,
             "fabric_loader_version"        : fabric_loader_version,
             "clothconfig_version_fabric"   : clothconfig_version_fabric,
             "neoforge_version"             : neoforge_version,

@@ -24,12 +24,12 @@ public class ConfigModuleFabric {
 
     public static void updateConfig() {
         bakeConfig(fabricConfig);
-        ConfigModule.updateRenderersFromConfig();
+        ClientConfigModule.updateRenderersFromConfig();
     }
 
     private static InteractionResult updateConfig(ConfigHolder<TTConfigFabric> configHolder, TTConfigFabric configFabric) {
         bakeConfig(configFabric);
-        ConfigModule.updateRenderersFromConfig();
+        ClientConfigModule.updateRenderersFromConfig();
         return InteractionResult.SUCCESS;
     }
 

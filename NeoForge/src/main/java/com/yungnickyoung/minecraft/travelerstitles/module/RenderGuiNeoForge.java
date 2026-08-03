@@ -1,8 +1,9 @@
 package com.yungnickyoung.minecraft.travelerstitles.module;
 
+import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesClient;
 import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
@@ -17,7 +18,7 @@ public class RenderGuiNeoForge {
         event.registerAboveAll(TravelersTitlesCommon.id("overlay"), RenderGuiNeoForge::render);
     }
 
-    private static void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        TravelersTitlesCommon.titleManager.renderTitles(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(false));
+    private static void render(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) {
+        TravelersTitlesClient.TITLE_MANAGER.renderTitles(guiGraphics, deltaTracker.getGameTimeDeltaPartialTick(false));
     }
 }

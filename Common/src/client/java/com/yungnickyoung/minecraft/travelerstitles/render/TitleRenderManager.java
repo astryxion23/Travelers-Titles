@@ -4,22 +4,24 @@ import com.yungnickyoung.minecraft.travelerstitles.TravelersTitlesCommon;
 import com.yungnickyoung.minecraft.travelerstitles.module.CompatModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.SoundModule;
 import com.yungnickyoung.minecraft.travelerstitles.module.TagModule;
-import com.yungnickyoung.minecraft.travelerstitles.services.Services;
-import net.minecraft.Util;
+import com.yungnickyoung.minecraft.travelerstitles.services.ClientServices;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.dimension.DimensionType;
+
+import java.util.Objects;
 
 public class TitleRenderManager {
     public final TitleRenderer<Biome> biomeTitleRenderer = new TitleRenderer<>(
@@ -57,7 +59,7 @@ public class TitleRenderManager {
     public void clientTick() {
         if (!Minecraft.getInstance().isPaused()) {
             dimensionTitleRenderer.tick();
-            Services.WAYSTONES.clientTick();
+            ClientServices.WAYSTONES.clientTick();
             biomeTitleRenderer.tick();
         }
     }
@@ -65,11 +67,11 @@ public class TitleRenderManager {
     /**
      * Renders all titles that are marked as ready to render.
      */
-    public void renderTitles(GuiGraphics guiGraphics, float partialTicks) {
+    public void renderTitles(GuiGraphicsExtractor guiGraphics, float partialTicks) {
         if (!Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             dimensionTitleRenderer.renderText(partialTicks, guiGraphics);
             biomeTitleRenderer.renderText(partialTicks, guiGraphics);
-            Services.WAYSTONES.renderText(partialTicks, guiGraphics);
+            ClientServices.WAYSTONES.renderText(partialTicks, guiGraphics);
         }
     }
 
@@ -109,7 +111,7 @@ public class TitleRenderManager {
 
             // Reset waystones cache on dimension change, if enabled
             if (CompatModule.isWaystonesLoaded && TravelersTitlesCommon.CONFIG.waystones.enabled && TravelersTitlesCommon.CONFIG.waystones.resetWaystoneCacheOnDimensionChange) {
-                Services.WAYSTONES.reset();
+                ClientServices.WAYSTONES.reset();
             }
         }
     }
@@ -126,7 +128,7 @@ public class TitleRenderManager {
 
         if (dimensionTitleRenderer.enabled && !dimensionTitleRenderer.matchesAnyRecentEntry(d -> d == currDimension)) {
             // Get dimension key
-            ResourceLocation dimensionBaseKey = world.dimension().location();
+            Identifier dimensionBaseKey = world.dimension().identifier();
             String dimensionNameKey = Util.makeDescriptionId(TravelersTitlesCommon.MOD_ID, dimensionBaseKey);
 
             // Ignore blacklisted dimensions
@@ -164,12 +166,13 @@ public class TitleRenderManager {
             return;
         }
 
-        ResourceLocation biomeBaseKey = world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biomeHolder.value());
+        final var biomeLookup = world.registryAccess().lookupOrThrow(Registries.BIOME);
+        Identifier biomeBaseKey = biomeLookup.getKey(biomeHolder.value());
 
         if (
             biomeTitleRenderer.enabled &&
             biomeTitleRenderer.cooldownTimer <= 0 &&
-            !biomeTitleRenderer.matchesAnyRecentEntry(b -> world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(b) == biomeBaseKey)
+            !biomeTitleRenderer.matchesAnyRecentEntry(b -> Objects.equals(biomeLookup.getKey(b), biomeBaseKey))
         ) {
             String overrideBiomeNameKey = Util.makeDescriptionId(TravelersTitlesCommon.MOD_ID + ".biome", biomeBaseKey);
             String normalBiomeNameKey = Util.makeDescriptionId("biome", biomeBaseKey);
@@ -213,7 +216,7 @@ public class TitleRenderManager {
                 // Play biome entry sound if we haven't just changed dimensions or entered a waystone's range.
                 // This ensures the biome sound doesn't overlap with the dimension and waystone sounds.
                 if (dimensionTitleRenderer.titleTimer <= 0) {
-                    if (!CompatModule.isWaystonesLoaded || !Services.WAYSTONES.isRendering()) {
+                    if (!CompatModule.isWaystonesLoaded || !ClientServices.WAYSTONES.isRendering()) {
                         player.playSound(SoundModule.BIOME, (float) TravelersTitlesCommon.CONFIG.sound.biomeVolume, (float) TravelersTitlesCommon.CONFIG.sound.biomePitch);
                     }
                 }
@@ -232,7 +235,7 @@ public class TitleRenderManager {
         }
 
         if (CompatModule.isWaystonesLoaded && TravelersTitlesCommon.CONFIG.waystones.enabled) {
-            return Services.WAYSTONES.updateWaystoneTitle(player);
+            return ClientServices.WAYSTONES.updateWaystoneTitle(player);
         }
 
         return false;

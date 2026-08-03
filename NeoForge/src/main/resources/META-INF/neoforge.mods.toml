@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="${neoforge_loader_version_range}"
 license="${license}"
-issueTrackerURL="https://github.com/yungnickyoung/Travelers-Titles"
+issueTrackerURL="https://github.com/astryxion/Travelers-Titles"
 
 [[mods]]
     modId="${mod_id}"
@@ -11,7 +11,7 @@ issueTrackerURL="https://github.com/yungnickyoung/Travelers-Titles"
     authors="Astryxion"
     description="${mod_description}"
     logoFile="icon.png"
-    displayURL="https://www.curseforge.com/minecraft/mc-mods/travelers-titles"
+    displayURL="https://github.com/astryxion/Travelers-Titles"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
