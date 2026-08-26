@@ -3,8 +3,8 @@ plugins {
 }
 
 base {
-    archivesName = "${mod_name}"
-    version = "${mc_version}-${project.name}-${project.version}"
+    archivesName = "${mod_name}${project.name}"
+    version = "${mc_version}-${project.version}"
 }
 
 group = maven_group
@@ -96,7 +96,7 @@ jar {
 
 processResources {
     def expandProps = [
-            "version"                      : version,
+            "version"                      : "${mc_version}-${rootProject.version}",
             "group"                        : project.group, //Else we target the task's group.
             "mc_version"                   : mc_version,
             "mc_version_range"             : mc_version_range,
@@ -109,6 +109,7 @@ processResources {
             "neoforge_loader_version_range": neoforge_loader_version_range,
             "mod_full_name"                : mod_full_name,
             "mod_author"                   : mod_author,
+            "mod_homepage"                 : mod_homepage,
             "mod_id"                       : mod_id,
             "license"                      : license,
             "mod_description"              : project.mod_description,

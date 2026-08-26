@@ -5,13 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "travelerstitles.refmap.json",
   "mixins": [],
-  "client": [
-    "ModelManagerAnimationSharedStateMixin",
-    "AnimationLoaderReloadSharedStateMixin"
-  ],
-  "mixins": [
-    "SharedStateAccessor"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

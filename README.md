@@ -2,15 +2,11 @@
 
 Epic, RPG-like titles when entering biomes & dimensions.
 
-Supports **NeoForge** and **Fabric** for Minecraft **26.2+**.
-
-**Repository:** [https://github.com/astryxion/Travelers-Titles](https://github.com/astryxion/Travelers-Titles)
-
 ## Attribution
 
 **Author:** Astryxion
 
-**Credits:** YUNGNICKYOUNG, Astryxion
+**Credits:** Astryxion, YUNGNICKYOUNG
 
 ## License
 
